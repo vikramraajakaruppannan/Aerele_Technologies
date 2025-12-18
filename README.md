@@ -96,6 +96,3 @@ Relationships:
 - **Architecture:** Flask Application Factory Pattern
 
 ---
-
-A resource allocation is blocked if:
-
