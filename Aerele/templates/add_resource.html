@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        
+        <div class="text-center mb-4">
+            <div style="display: inline-block; padding: 1rem; background: rgba(255,255,255,0.2); border-radius: 50%; margin-bottom: 1rem;">
+                <i class="fa-solid fa-box-open" style="font-size: 3rem; color: white;"></i>
+            </div>
+            <h3 class="mb-2">Add New Resource</h3>
+            <p style="color: rgba(255,255,255,0.8);">Register a new resource for event allocation</p>
+        </div>
+
+        <div class="card shadow-lg">
+            <div class="card-body p-4">
+                <form method="POST">
+                    
+                    <div class="mb-4">
+                        <label class="form-label">
+                            <i class="fa-solid fa-signature text-primary me-2"></i>Resource Name
+                        </label>
+                        <input class="form-control" name="resource_name" placeholder="e.g., Conference Room A, John Doe, Projector" required>
+                        <small class="text-muted">Enter a unique name for this resource</small>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">
+                            <i class="fa-solid fa-layer-group text-success me-2"></i>Resource Type
+                        </label>
+                        <select class="form-select" name="resource_type">
+                            <option value="room">
+                                <i class="fa-solid fa-door-open"></i> Room
+                            </option>
+                            <option value="instructor">
+                                <i class="fa-solid fa-user-tie"></i> Instructor
+                            </option>
+                            <option value="equipment">
+                                <i class="fa-solid fa-wrench"></i> Equipment
+                            </option>
+                        </select>
+                        <small class="text-muted">Select the category that best describes this resource</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="row g-2">
+                            <div class="col">
+                                <div class="p-3 text-center rounded" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                                    <i class="fa-solid fa-door-open fa-2x mb-2"></i>
+                                    <p class="mb-0 small">Room</p>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="p-3 text-center rounded" style="background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white;">
+                                    <i class="fa-solid fa-user-tie fa-2x mb-2"></i>
+                                    <p class="mb-0 small">Instructor</p>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="p-3 text-center rounded" style="background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%); color: white;">
+                                    <i class="fa-solid fa-wrench fa-2x mb-2"></i>
+                                    <p class="mb-0 small">Equipment</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 mt-4">
+                        <button class="btn btn-success btn-lg">
+                            <i class="fa-solid fa-check me-2"></i> Save Resource
+                        </button>
+                        <a href="/resources" class="btn btn-outline-secondary">
+                            <i class="fa-solid fa-arrow-left me-2"></i> Cancel
+                        </a>
+                    </div>
+                    
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<style>
+    .btn-outline-secondary {
+        border: 2px solid #e2e8f0;
+        color: #4a5568;
+        background: white;
+    }
+    
+    .btn-outline-secondary:hover {
+        background: #f7fafc;
+        border-color: #cbd5e0;
+        color: #2d3748;
+    }
+</style>
+
+{% endblock %}

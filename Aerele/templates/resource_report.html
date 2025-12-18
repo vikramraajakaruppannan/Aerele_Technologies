@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h3 class="mb-4">📊 Resource Utilization Report</h3>
+
+<div class="card shadow-lg mb-4">
+    <div class="card-body p-4">
+        <h5 class="mb-4">
+            <i class="fa-solid fa-calendar-range me-2" style="color: #667eea;"></i>Select Date Range
+        </h5>
+        <form method="POST">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">
+                        <i class="fa-solid fa-calendar-day text-success me-2"></i>Start Date
+                    </label>
+                    <input type="date" name="start_date" class="form-control" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">
+                        <i class="fa-solid fa-calendar-check text-danger me-2"></i>End Date
+                    </label>
+                    <input type="date" name="end_date" class="form-control" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label d-block">&nbsp;</label>
+                    <button class="btn btn-dark w-100">
+                        <i class="fa-solid fa-chart-line me-2"></i>Generate Report
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% if report %}
+<div class="card shadow-lg mb-4">
+    <div class="card-body p-4">
+        <h5 class="mb-4">
+            <i class="fa-solid fa-chart-bar me-2" style="color: #667eea;"></i>Utilization Chart
+        </h5>
+        <canvas id="utilChart"></canvas>
+    </div>
+</div>
+
+<div class="card shadow-lg">
+    <div class="card-body p-0">
+        <div class="p-4 border-bottom" style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);">
+            <h5 class="mb-0">
+                <i class="fa-solid fa-table me-2" style="color: #667eea;"></i>Detailed Breakdown
+            </h5>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                    <tr>
+                        <th class="py-3 px-4" style="border: none;">
+                            <i class="fa-solid fa-box me-2"></i>Resource
+                        </th>
+                        <th class="py-3 px-4" style="border: none;">
+                            <i class="fa-solid fa-clock me-2"></i>Total Hours
+                        </th>
+                        <th class="py-3 px-4" style="border: none;">
+                            <i class="fa-solid fa-calendar-days me-2"></i>Upcoming Bookings
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in report %}
+                    <tr style="transition: all 0.2s ease;">
+                        <td class="py-3 px-4">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3" style="width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center;">
+                                    <i class="fa-solid fa-cube" style="color: white;"></i>
+                                </div>
+                                <div class="fw-semibold">{{ row.resource }}</div>
+                            </div>
+                        </td>
+                        <td class="py-3 px-4">
+                            <div class="d-flex align-items-center">
+                                <div class="progress flex-grow-1 me-3" style="height: 8px;">
+                                    <div class="progress-bar" style="width: {% if row.hours > 40 %}100{% else %}{{ (row.hours / 40 * 100)|round }}{% endif %}%; background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);"></div>
+                                </div>
+                                <span class="badge" style="background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); padding: 0.5rem 0.75rem; min-width: 60px;">
+                                    {{ row.hours }}h
+                                </span>
+                            </div>
+                        </td>
+                        <td class="py-3 px-4">
+                            {% if row.upcoming %}
+                                {% for b in row.upcoming %}
+                                    <div class="mb-2">
+                                        <span class="badge bg-light text-dark border" style="padding: 0.5rem 0.75rem;">
+                                            <i class="fa-solid fa-calendar-day me-1" style="color: #667eea;"></i>{{ b }}
+                                        </span>
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <span class="text-muted">
+                                    <i class="fa-solid fa-ban me-1"></i>No bookings
+                                </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const ctx = document.getElementById('utilChart');
+new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: [{% for r in report %}"{{ r.resource }}",{% endfor %}],
+        datasets: [{
+            label: 'Hours Utilized',
+            data: [{% for r in report %}{{ r.hours }},{% endfor %}],
+            backgroundColor: 'rgba(102, 126, 234, 0.8)',
+            borderColor: 'rgba(102, 126, 234, 1)',
+            borderWidth: 2,
+            borderRadius: 8
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                display: false
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                grid: {
+                    color: 'rgba(0, 0, 0, 0.05)'
+                }
+            },
+            x: {
+                grid: {
+                    display: false
+                }
+            }
+        }
+    }
+});
+</script>
+{% else %}
+<div class="card shadow-lg text-center py-5">
+    <div class="card-body">
+        <div style="font-size: 4rem; opacity: 0.3; margin-bottom: 1rem;">
+            <i class="fa-solid fa-chart-pie"></i>
+        </div>
+        <h4 class="text-muted mb-3">Generate Your First Report</h4>
+        <p class="text-muted mb-0">Select a date range above to view resource utilization statistics</p>
+    </div>
+</div>
+{% endif %}
+
+<style>
+    .table tbody tr:hover {
+        background: rgba(102, 126, 234, 0.05);
+        transform: scale(1.002);
+    }
+</style>
+
+{% endblock %}

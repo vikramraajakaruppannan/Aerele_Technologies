@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="mb-0">📅 Events</h3>
+    <a href="/events/add" class="btn btn-primary">
+        <i class="fa-solid fa-plus"></i> Add Event
+    </a>
+</div>
+
+<div class="card shadow-lg mb-4">
+    <div class="card-body">
+        <form method="GET">
+            <div class="input-group">
+                <span class="input-group-text bg-white border-end-0" style="border-radius: 10px 0 0 10px;">
+                    <i class="fa-solid fa-search text-muted"></i>
+                </span>
+                <input type="text" name="q" class="form-control border-start-0"
+                       placeholder="Search events by title, description..."
+                       style="border-left: none !important; border-radius: 0 10px 10px 0;">
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card shadow-lg">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                    <tr>
+                        <th class="py-3 px-4" style="border: none;">
+                            <i class="fa-solid fa-heading me-2"></i>Title
+                        </th>
+                        <th class="py-3 px-4" style="border: none;">
+                            <i class="fa-solid fa-calendar-day me-2"></i>Start
+                        </th>
+                        <th class="py-3 px-4" style="border: none;">
+                            <i class="fa-solid fa-calendar-check me-2"></i>End
+                        </th>
+                        <th class="py-3 px-4" style="border: none;">
+                            <i class="fa-solid fa-file-lines me-2"></i>Description
+                        </th>
+                        <!-- NEW EMPTY COLUMN (NO UI CHANGE) -->
+                        <th class="py-3 px-4" style="border: none;"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for event in events %}
+                    <tr style="transition: all 0.2s ease;">
+                        <td class="py-3 px-4 fw-semibold">{{ event.title }}</td>
+                        <td class="py-3 px-4">
+                            <span class="badge"
+                                  style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 0.5rem 0.75rem;">
+                                {{ event.start_time }}
+                            </span>
+                        </td>
+                        <td class="py-3 px-4">
+                            <span class="badge"
+                                  style="background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); padding: 0.5rem 0.75rem;">
+                                {{ event.end_time }}
+                            </span>
+                        </td>
+                        <td class="py-3 px-4 text-muted">{{ event.description }}</td>
+
+                        <!-- DELETE ICON (MINIMAL, NON-INTRUSIVE) -->
+                        <td class="py-3 px-4 text-end">
+                            <a href="/events/delete/{{ event.event_id }}"
+                               onclick="return confirm('Delete this event? All allocations will be removed.');"
+                               style="color:#dc3545; opacity:0.6;">
+                                <i class="fa-solid fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    .table tbody tr:hover {
+        background: rgba(102, 126, 234, 0.05);
+        transform: scale(1.005);
+    }
+
+    .input-group-text {
+        border: 2px solid #e2e8f0;
+    }
+
+    .form-control {
+        border: 2px solid #e2e8f0;
+    }
+</style>
+
+{% endblock %}

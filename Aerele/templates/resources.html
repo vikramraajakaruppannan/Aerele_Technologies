@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="mb-0">🧰 Resources</h3>
+    <a href="/resources/add" class="btn btn-primary">
+        <i class="fa-solid fa-plus"></i> Add Resource
+    </a>
+</div>
+
+<div class="row g-4 mb-4">
+    {% for r in resources %}
+    <div class="col-md-4">
+        <!-- ONLY CHANGE: position-relative added -->
+        <div class="card shadow-lg h-100 position-relative">
+            
+            <!-- EDIT + DELETE (MINIMAL, TOP-RIGHT) -->
+            <div class="position-absolute top-0 end-0 p-2">
+                <a href="/resources/delete/{{ r.resource_id }}"
+                   onclick="return confirm('Delete this resource? All allocations will be removed.');"
+                   style="color:#dc3545; opacity:0.6;">
+                    <i class="fa-solid fa-trash"></i>
+                </a>
+            </div>
+
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="me-3" style="width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; background: {% if r.resource_type == 'room' %}linear-gradient(135deg, #667eea 0%, #764ba2 100%){% elif r.resource_type == 'instructor' %}linear-gradient(135deg, #48bb78 0%, #38a169 100%){% else %}linear-gradient(135deg, #ed8936 0%, #dd6b20 100%){% endif %};">
+                        <i class="fa-solid {% if r.resource_type == 'room' %}fa-door-open{% elif r.resource_type == 'instructor' %}fa-user-tie{% else %}fa-wrench{% endif %}" style="font-size: 1.5rem; color: white;"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h5 class="mb-1" style="font-weight: 700;">{{ r.resource_name }}</h5>
+                        <span class="badge" style="background: {% if r.resource_type == 'room' %}linear-gradient(135deg, #667eea 0%, #764ba2 100%){% elif r.resource_type == 'instructor' %}linear-gradient(135deg, #48bb78 0%, #38a169 100%){% else %}linear-gradient(135deg, #ed8936 0%, #dd6b20 100%){% endif %}; padding: 0.4rem 0.8rem;">
+                            <i class="fa-solid fa-tag me-1"></i>{{ r.resource_type }}
+                        </span>
+                    </div>
+                </div>
+                <div class="pt-3 border-top">
+                    <small class="text-muted">
+                        <i class="fa-solid fa-circle-info me-1"></i>Available for booking
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% if not resources %}
+<div class="card shadow-lg text-center py-5">
+    <div class="card-body">
+        <div style="font-size: 4rem; opacity: 0.3; margin-bottom: 1rem;">
+            <i class="fa-solid fa-box-open"></i>
+        </div>
+        <h4 class="text-muted mb-3">No Resources Yet</h4>
+        <p class="text-muted mb-4">Get started by adding your first resource</p>
+        <a href="/resources/add" class="btn btn-primary">
+            <i class="fa-solid fa-plus me-2"></i> Add Your First Resource
+        </a>
+    </div>
+</div>
+{% endif %}
+
+<style>
+    .card {
+        transition: all 0.3s ease;
+        border: none;
+    }
+    
+    .card:hover {
+        transform: translateY(-8px);
+    }
+</style>
+
+{% endblock %}

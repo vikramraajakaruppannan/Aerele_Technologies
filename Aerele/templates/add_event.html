@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        
+        <div class="text-center mb-4">
+            <div style="display: inline-block; padding: 1rem; background: rgba(255,255,255,0.2); border-radius: 50%; margin-bottom: 1rem;">
+                <i class="fa-solid fa-calendar-plus" style="font-size: 3rem; color: white;"></i>
+            </div>
+            <h3 class="mb-2">Create New Event</h3>
+            <p style="color: rgba(255,255,255,0.8);">Fill in the details below to schedule a new event</p>
+        </div>
+
+        <div class="card shadow-lg">
+            <div class="card-body p-4">
+                <form method="POST">
+                    
+                    <div class="mb-4">
+                        <label class="form-label">
+                            <i class="fa-solid fa-heading text-primary me-2"></i>Event Title
+                        </label>
+                        <input class="form-control" name="title" placeholder="Enter event title" required>
+                        <small class="text-muted">Give your event a descriptive title</small>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <label class="form-label">
+                                <i class="fa-solid fa-calendar-day text-success me-2"></i>Start Time
+                            </label>
+                            <input type="datetime-local" class="form-control" name="start_time" required>
+                        </div>
+
+                        <div class="col-md-6 mb-4">
+                            <label class="form-label">
+                                <i class="fa-solid fa-calendar-check text-danger me-2"></i>End Time
+                            </label>
+                            <input type="datetime-local" class="form-control" name="end_time" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">
+                            <i class="fa-solid fa-file-lines text-info me-2"></i>Description
+                        </label>
+                        <textarea class="form-control" name="description" rows="4" placeholder="Add event description (optional)"></textarea>
+                        <small class="text-muted">Provide additional details about the event</small>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-success btn-lg">
+                            <i class="fa-solid fa-check me-2"></i> Create Event
+                        </button>
+                        <a href="/events" class="btn btn-outline-secondary">
+                            <i class="fa-solid fa-arrow-left me-2"></i> Cancel
+                        </a>
+                    </div>
+                    
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<style>
+    .btn-outline-secondary {
+        border: 2px solid #e2e8f0;
+        color: #4a5568;
+        background: white;
+    }
+    
+    .btn-outline-secondary:hover {
+        background: #f7fafc;
+        border-color: #cbd5e0;
+        color: #2d3748;
+    }
+</style>
+
+{% endblock %}

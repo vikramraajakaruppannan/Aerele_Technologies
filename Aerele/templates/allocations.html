@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="mb-0">🔎 Allocations</h3>
+    <a href="/allocate" class="btn btn-primary">
+        <i class="fa-solid fa-plus"></i> New Allocation
+    </a>
+</div>
+
+{% if allocations %}
+<div class="card shadow-lg">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                    <tr>
+                        <th class="py-3 px-4" style="border: none;">
+                            <i class="fa-solid fa-calendar me-2"></i>Event
+                        </th>
+                        <th class="py-3 px-4" style="border: none;">
+                            <i class="fa-solid fa-box me-2"></i>Resource
+                        </th>
+                        <th class="py-3 px-4" style="border: none;">
+                            <i class="fa-solid fa-tag me-2"></i>Type
+                        </th>
+                        <!-- NEW EMPTY COLUMN -->
+                        <th class="py-3 px-4" style="border: none;"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for a in allocations %}
+                    <tr style="transition: all 0.2s ease;">
+                        <td class="py-3 px-4">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3" style="width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center;">
+                                    <i class="fa-solid fa-calendar-day" style="color: white;"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-semibold">{{ a.event.title }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="py-3 px-4">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3" style="width: 40px; height: 40px; border-radius: 10px; background: {% if a.resource.resource_type == 'room' %}linear-gradient(135deg, #667eea 0%, #764ba2 100%){% elif a.resource.resource_type == 'instructor' %}linear-gradient(135deg, #48bb78 0%, #38a169 100%){% else %}linear-gradient(135deg, #ed8936 0%, #dd6b20 100%){% endif %}; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fa-solid {% if a.resource.resource_type == 'room' %}fa-door-open{% elif a.resource.resource_type == 'instructor' %}fa-user-tie{% else %}fa-wrench{% endif %}" style="color: white;"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-semibold">{{ a.resource.resource_name }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="py-3 px-4">
+                            <span class="badge" style="background: {% if a.resource.resource_type == 'room' %}linear-gradient(135deg, #667eea 0%, #764ba2 100%){% elif a.resource.resource_type == 'instructor' %}linear-gradient(135deg, #48bb78 0%, #38a169 100%){% else %}linear-gradient(135deg, #ed8936 0%, #dd6b20 100%){% endif %}; padding: 0.5rem 0.75rem; font-size: 0.85rem;">
+                                <i class="fa-solid fa-circle me-1" style="font-size: 0.5rem;"></i>{{ a.resource.resource_type }}
+                            </span>
+                        </td>
+
+                        <!-- DELETE ICON (MINIMAL, NO UI CHANGE) -->
+                        <td class="py-3 px-4 text-end">
+                            <a href="/allocations/delete/{{ a.allocation_id }}"
+                               onclick="return confirm('Remove this allocation?');"
+                               style="color:#dc3545; opacity:0.6;">
+                                <i class="fa-solid fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="card shadow-lg text-center py-5">
+    <div class="card-body">
+        <div style="font-size: 4rem; opacity: 0.3; margin-bottom: 1rem;">
+            <i class="fa-solid fa-link-slash"></i>
+        </div>
+        <h4 class="text-muted mb-3">No Allocations Yet</h4>
+        <p class="text-muted mb-4">Start by allocating resources to your events</p>
+        <a href="/allocate" class="btn btn-primary">
+            <i class="fa-solid fa-plus me-2"></i> Create First Allocation
+        </a>
+    </div>
+</div>
+{% endif %}
+
+<style>
+    .table tbody tr:hover {
+        background: rgba(102, 126, 234, 0.05);
+        transform: scale(1.002);
+    }
+</style>
+
+{% endblock %}
