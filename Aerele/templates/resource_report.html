@@ -34,14 +34,51 @@
 </div>
 
 {% if report %}
-<div class="card shadow-lg mb-4">
-    <div class="card-body p-4">
-        <h5 class="mb-4">
-            <i class="fa-solid fa-chart-bar me-2" style="color: #667eea;"></i>Utilization Chart
-        </h5>
-        <canvas id="utilChart"></canvas>
+<div class="row g-4 mb-4">
+
+    <!-- TOTAL UTILIZED HOURS -->
+    <div class="col-md-4">
+        <div class="card shadow-lg border-0"
+             style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+            <div class="card-body text-center">
+                <i class="fa-solid fa-clock fa-2x mb-2"></i>
+                <h6>Total Utilized Hours</h6>
+                <h2>
+                    {{ report | sum(attribute='hours') | round(1) }} hrs
+                </h2>
+            </div>
+        </div>
     </div>
+
+    <!-- MOST USED RESOURCE -->
+    <div class="col-md-4">
+        <div class="card shadow-lg border-0"
+             style="background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white;">
+            <div class="card-body text-center">
+                <i class="fa-solid fa-fire fa-2x mb-2"></i>
+                <h6>Most Used Resource</h6>
+                <h5>
+                    {% set top = report | sort(attribute='hours', reverse=True) | first %}
+                    {{ top.resource if top else "N/A" }}
+                </h5>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOTAL ACTIVE RESOURCES -->
+    <div class="col-md-4">
+        <div class="card shadow-lg border-0"
+             style="background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%); color: white;">
+            <div class="card-body text-center">
+                <i class="fa-solid fa-boxes-stacked fa-2x mb-2"></i>
+                <h6>Total Resources Used</h6>
+                <h2>{{ report|length }}</h2>
+            </div>
+        </div>
+    </div>
+
 </div>
+
 
 <div class="card shadow-lg">
     <div class="card-body p-0">

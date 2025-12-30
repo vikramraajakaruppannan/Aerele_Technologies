@@ -5,8 +5,8 @@
 
 <div class="row g-4">
 
-    <div class="col-md-3">
-        <div class="card shadow-lg border-0" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+    <div class="col-md-4">
+        <div class="card shadow-lg border-0" style="background: linear-gradient(135deg, #484c5dff 0%, #764ba2 100%); color: white;">
             <div class="card-body text-center">
                 <div style="font-size: 3rem; opacity: 0.9;">
                     <i class="fa-solid fa-calendar"></i>
@@ -17,8 +17,8 @@
         </div>
     </div>
 
-    <div class="col-md-3">
-        <div class="card shadow-lg border-0" style="background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white;">
+    <div class="col-md-4">
+        <div class="card shadow-lg border-0" style="background: linear-gradient(135deg, #3d4d44ff 0%, #38a169 100%); color: white;">
             <div class="card-body text-center">
                 <div style="font-size: 3rem; opacity: 0.9;">
                     <i class="fa-solid fa-box"></i>
@@ -29,8 +29,8 @@
         </div>
     </div>
 
-    <div class="col-md-3">
-        <div class="card shadow-lg border-0" style="background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%); color: white;">
+    <div class="col-md-4">
+        <div class="card shadow-lg border-0" style="background: linear-gradient(135deg, #51463dff 0%, #dd6b20 100%); color: white;">
             <div class="card-body text-center">
                 <div style="font-size: 3rem; opacity: 0.9;">
                     <i class="fa-solid fa-link"></i>
@@ -41,8 +41,8 @@
         </div>
     </div>
 
-    <div class="col-md-3">
-        <div class="card shadow-lg border-0" style="background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%); color: white;">
+    <div class="col-md-4">
+        <div class="card shadow-lg border-0" style="background: linear-gradient(135deg, #2d3748 0%, #5471acff 100%); color: white;">
             <div class="card-body text-center">
                 <div style="font-size: 3rem; opacity: 0.9;">
                     <i class="fa-solid fa-clock"></i>
@@ -52,6 +52,29 @@
             </div>
         </div>
     </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-lg border-0" style="background: linear-gradient(135deg, #203422 0%, #11d853 100%); color: white;">
+            <div class="card-body text-center">
+                <div style="font-size: 3rem;">
+                    <i class="fa-solid fa-check-circle"></i>
+                </div>
+                <h6 class="mt-3">Completed Events</h6>
+                <h2>{{ stats.completed }}</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-lg border-0" style="background: linear-gradient(135deg, #0f2027 0%, #5091a7ff 50%, #2c5364 100%); color: white;">
+            <div class="card-body text-center">
+                <div style="font-size: 3rem;">
+                    <i class="fa-solid fa-play-circle"></i>
+                </div>
+                <h6 class="mt-3">Ongoing Events</h6>
+                <h2>{{ stats.ongoing }}</h2>
+            </div>
+        </div>
 
 </div>
 

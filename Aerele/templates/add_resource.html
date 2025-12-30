@@ -16,33 +16,42 @@
             <div class="card-body p-4">
                 <form method="POST">
                     
+                    <!-- Resource Name -->
                     <div class="mb-4">
                         <label class="form-label">
                             <i class="fa-solid fa-signature text-primary me-2"></i>Resource Name
                         </label>
-                        <input class="form-control" name="resource_name" placeholder="e.g., Conference Room A, John Doe, Projector" required>
-                        <small class="text-muted">Enter a unique name for this resource</small>
+                        <input class="form-control" name="resource_name"
+                               placeholder="e.g., Conference Room A, John Doe, Projector"
+                               required>
                     </div>
 
+                    <!-- Resource Type -->
                     <div class="mb-4">
                         <label class="form-label">
                             <i class="fa-solid fa-layer-group text-success me-2"></i>Resource Type
                         </label>
-                        <select class="form-select" name="resource_type">
-                            <option value="room">
-                                <i class="fa-solid fa-door-open"></i> Room
-                            </option>
-                            <option value="instructor">
-                                <i class="fa-solid fa-user-tie"></i> Instructor
-                            </option>
-                            <option value="equipment">
-                                <i class="fa-solid fa-wrench"></i> Equipment
-                            </option>
+                        <select class="form-select" name="resource_type"
+                                onchange="toggleCustomType(this)">
+                            <option value="room">Room</option>
+                            <option value="instructor">Instructor</option>
+                            <option value="equipment">Equipment</option>
+                            <option value="custom">Custom</option>
                         </select>
-                        <small class="text-muted">Select the category that best describes this resource</small>
                     </div>
 
-                    <div class="mb-3">
+                    <!-- Custom Type -->
+                    <div class="mb-4" id="customTypeBox" style="display:none;">
+                        <label class="form-label">
+                            <i class="fa-solid fa-pen text-warning me-2"></i>Custom Resource Type
+                        </label>
+                        <input type="text" class="form-control"
+                               name="custom_type"
+                               placeholder="e.g., Projector, Lab, Vehicle">
+                    </div>
+
+                    <!-- Icons -->
+                    <!--<div class="mb-3">
                         <div class="row g-2">
                             <div class="col">
                                 <div class="p-3 text-center rounded" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
@@ -63,8 +72,9 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
 
+                    <!-- Buttons -->
                     <div class="d-grid gap-2 mt-4">
                         <button class="btn btn-success btn-lg">
                             <i class="fa-solid fa-check me-2"></i> Save Resource
@@ -73,7 +83,7 @@
                             <i class="fa-solid fa-arrow-left me-2"></i> Cancel
                         </a>
                     </div>
-                    
+
                 </form>
             </div>
         </div>
@@ -81,18 +91,11 @@
     </div>
 </div>
 
-<style>
-    .btn-outline-secondary {
-        border: 2px solid #e2e8f0;
-        color: #4a5568;
-        background: white;
-    }
-    
-    .btn-outline-secondary:hover {
-        background: #f7fafc;
-        border-color: #cbd5e0;
-        color: #2d3748;
-    }
-</style>
+<script>
+function toggleCustomType(select) {
+    const box = document.getElementById("customTypeBox");
+    box.style.display = select.value === "custom" ? "block" : "none";
+}
+</script>
 
 {% endblock %}

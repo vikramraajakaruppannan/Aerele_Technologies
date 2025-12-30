@@ -13,10 +13,12 @@
         </div>
 
         {% if error %}
-        <div class="alert alert-danger shadow-lg" style="border-left: 4px solid #dc3545;">
-            <i class="fa-solid fa-triangle-exclamation me-2"></i>{{ error }}
+        <div class="alert alert-danger">
+            <i class="fa-solid fa-triangle-exclamation me-2"></i>
+            {{ error }}
         </div>
         {% endif %}
+
 
         <div class="card shadow-lg">
             <div class="card-body p-4">

@@ -8,69 +8,89 @@
     </a>
 </div>
 
+<!-- Search -->
 <div class="card shadow-lg mb-4">
     <div class="card-body">
         <form method="GET">
             <div class="input-group">
-                <span class="input-group-text bg-white border-end-0" style="border-radius: 10px 0 0 10px;">
+                <span class="input-group-text bg-white border-end-0">
                     <i class="fa-solid fa-search text-muted"></i>
                 </span>
-                <input type="text" name="q" class="form-control border-start-0"
-                       placeholder="Search events by title, description..."
-                       style="border-left: none !important; border-radius: 0 10px 10px 0;">
+                <input type="text" name="q"
+                       class="form-control border-start-0"
+                       placeholder="Search events...">
             </div>
         </form>
     </div>
 </div>
 
+<!-- Events Table -->
 <div class="card shadow-lg">
     <div class="card-body p-0">
         <div class="table-responsive">
             <table class="table table-hover mb-0">
                 <thead style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
                     <tr>
-                        <th class="py-3 px-4" style="border: none;">
-                            <i class="fa-solid fa-heading me-2"></i>Title
-                        </th>
-                        <th class="py-3 px-4" style="border: none;">
-                            <i class="fa-solid fa-calendar-day me-2"></i>Start
-                        </th>
-                        <th class="py-3 px-4" style="border: none;">
-                            <i class="fa-solid fa-calendar-check me-2"></i>End
-                        </th>
-                        <th class="py-3 px-4" style="border: none;">
-                            <i class="fa-solid fa-file-lines me-2"></i>Description
-                        </th>
-                        <!-- NEW EMPTY COLUMN (NO UI CHANGE) -->
-                        <th class="py-3 px-4" style="border: none;"></th>
+                        <th class="py-3 px-4">Title</th>
+                        <th class="py-3 px-4">Start</th>
+                        <th class="py-3 px-4">End</th>
+                        <th class="py-3 px-4">Description</th>
+                        <th class="py-3 px-4">Status</th>
+                        <th class="py-3 px-4"></th>
                     </tr>
                 </thead>
+
                 <tbody>
                     {% for event in events %}
                     <tr style="transition: all 0.2s ease;">
-                        <td class="py-3 px-4 fw-semibold">{{ event.title }}</td>
+
+                        <td class="py-3 px-4 fw-semibold">
+                            {{ event.title }}
+                        </td>
+
                         <td class="py-3 px-4">
                             <span class="badge"
-                                  style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 0.5rem 0.75rem;">
+                                  style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
                                 {{ event.start_time }}
                             </span>
                         </td>
+
                         <td class="py-3 px-4">
                             <span class="badge"
-                                  style="background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); padding: 0.5rem 0.75rem;">
+                                  style="background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);">
                                 {{ event.end_time }}
                             </span>
                         </td>
-                        <td class="py-3 px-4 text-muted">{{ event.description }}</td>
 
-                        <!-- DELETE ICON (MINIMAL, NON-INTRUSIVE) -->
-                        <td class="py-3 px-4 text-end">
+                        <td class="py-3 px-4 text-muted">
+                            {{ event.description }}
+                        </td>
+
+                        <!-- STATUS -->
+                        <td class="py-3 px-4">
+                            {% if event.status == "Completed" %}
+                                <span class="badge bg-secondary">Completed</span>
+                            {% elif event.status == "Ongoing" %}
+                                <span class="badge bg-warning text-dark">Ongoing</span>
+                            {% else %}
+                                <span class="badge bg-success">Upcoming</span>
+                            {% endif %}
+                        </td>
+
+                        <!-- ACTIONS -->
+                        <td class="py-3 px-4">
+                            <a href="/events/edit/{{ event.event_id }}"
+                               class="btn btn-sm btn-outline-primary me-2">
+                                <i class="fa-solid fa-pen"></i>
+                            </a>
+
                             <a href="/events/delete/{{ event.event_id }}"
-                               onclick="return confirm('Delete this event? All allocations will be removed.');"
-                               style="color:#dc3545; opacity:0.6;">
+                               onclick="return confirm('Delete this event?')"
+                               class="btn btn-sm btn-outline-danger">
                                 <i class="fa-solid fa-trash"></i>
                             </a>
                         </td>
+
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -85,10 +105,7 @@
         transform: scale(1.005);
     }
 
-    .input-group-text {
-        border: 2px solid #e2e8f0;
-    }
-
+    .input-group-text,
     .form-control {
         border: 2px solid #e2e8f0;
     }

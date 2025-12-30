@@ -1,8 +1,8 @@
 from flask import Flask, render_template, request, redirect, flash
+from datetime import datetime
 from config import Config
 from extensions import db
-from datetime import datetime
-
+from models import Event,Resource,EventResourceAllocation
 
 def create_app():
     app = Flask(__name__)
@@ -11,92 +11,159 @@ def create_app():
     db.init_app(app)
 
     with app.app_context():
-        from models import Event, Resource, EventResourceAllocation
         db.create_all()
 
-    # ---------------- DASHBOARD ----------------
+    # ================= DASHBOARD =================
     @app.route("/")
     def dashboard():
-        from models import Event, Resource, EventResourceAllocation
 
         stats = {
             "events": Event.query.count(),
             "resources": Resource.query.count(),
-            "allocations": EventResourceAllocation.query.count(),
-            "upcoming": Event.query.filter(Event.start_time > datetime.now()).count()
+            "allocations": EventResourceAllocation.query.filter_by(is_active=True).count(),
+            "upcoming": Event.query.filter(Event.start_time > datetime.now()).count(),
+            "completed": Event.query.filter(Event.end_time < datetime.now()).count(),
+            "ongoing": Event.query.filter(Event.start_time <= datetime.now(), Event.end_time >= datetime.now()).count()
         }
         return render_template("dashboard.html", stats=stats)
 
-    # ---------------- EVENTS ----------------
+    # ================= EVENTS =================
     @app.route("/events")
     def view_events():
-        from models import Event
-        events = Event.query.all()
+
+        events = Event.query.order_by(Event.start_time).all()
+        # events = Event.query.filter(Event.end_time > datetime.now()).all()
+        
+        # Add status dynamically
+        for event in events:
+            if event.end_time < datetime.now():
+                event.status = "Completed"
+            elif event.start_time > datetime.now():
+                event.status = "Upcoming"
+            else:
+                event.status = "Ongoing"
+
         return render_template("events.html", events=events)
+
 
     @app.route("/events/add", methods=["GET", "POST"])
     def add_event():
-        from models import Event
 
         if request.method == "POST":
-            event = Event(
-                title=request.form["title"],
-                start_time=datetime.fromisoformat(request.form["start_time"]),
-                end_time=datetime.fromisoformat(request.form["end_time"]),
-                description=request.form["description"]
-            )
-            db.session.add(event)
-            db.session.commit()
-            flash("Event created successfully", "success")
+            try:
+                event = Event(
+                    title=request.form["title"],
+                    start_time=datetime.fromisoformat(request.form["start_time"]),
+                    end_time=datetime.fromisoformat(request.form["end_time"]),
+                    description=request.form["description"]
+                )
+                start_time = datetime.fromisoformat(request.form["start_time"])
+                end_time = datetime.fromisoformat(request.form["end_time"])
+
+                if end_time <= start_time:
+                    flash("End time must be greater than start time", "danger")
+                    return redirect("/events/add")
+                
+                if start_time < datetime.now():
+                    flash("Cannot create events in the past", "danger")
+                    return redirect("/events/add")
+
+                db.session.add(event)
+                db.session.commit()
+                flash("Event created successfully", "success")
+            except Exception as e:
+                db.session.rollback()
+                flash("Failed to create event", "danger")
+
             return redirect("/events")
 
         return render_template("add_event.html")
 
     @app.route("/events/delete/<int:event_id>")
     def delete_event(event_id):
-        from models import Event
+
         event = Event.query.get_or_404(event_id)
+        
         db.session.delete(event)
         db.session.commit()
         flash("Event deleted successfully", "success")
         return redirect("/events")
+    
+    @app.route("/events/edit/<int:event_id>", methods=["GET", "POST"])
+    def edit_event(event_id):
 
-    # ---------------- RESOURCES ----------------
+        event = Event.query.get_or_404(event_id)
+
+        if request.method == "POST":
+            try:
+                event.title = request.form["title"]
+                event.start_time = datetime.fromisoformat(request.form["start_time"])
+                event.end_time = datetime.fromisoformat(request.form["end_time"])
+                event.description = request.form["description"]
+
+                db.session.commit()
+                flash("Event updated successfully", "success")
+                return redirect("/events")
+
+            except Exception as e:
+                db.session.rollback()
+                flash("Failed to update event", "danger")
+
+        return render_template("edit_event.html", event=event)
+
+
+    # ================= RESOURCES =================
     @app.route("/resources")
     def view_resources():
-        from models import Resource
-        resources = Resource.query.all()
-        return render_template("resources.html", resources=resources)
+        return render_template("resources.html", resources=Resource.query.all())
 
     @app.route("/resources/add", methods=["GET", "POST"])
     def add_resource():
-        from models import Resource
 
         if request.method == "POST":
-            resource = Resource(
-                resource_name=request.form["resource_name"],
-                resource_type=request.form["resource_type"]
-            )
-            db.session.add(resource)
-            db.session.commit()
-            flash("Resource added successfully", "success")
-            return redirect("/resources")
+            try:
+                resource_name = request.form.get("resource_name")
+                resource_type = request.form.get("resource_type")
+                custom_type = request.form.get("custom_type")
+
+                # Handle custom type safely
+                if resource_type == "custom":
+                    if not custom_type or custom_type.strip() == "":
+                        flash("Please enter a custom resource type.", "danger")
+                        return redirect("/resources/add")
+                    resource_type = custom_type.strip()
+
+                resource = Resource(
+                    resource_name=resource_name,
+                    resource_type=resource_type
+                )
+
+                db.session.add(resource)
+                db.session.commit()
+
+                flash("Resource added successfully", "success")
+                return redirect("/resources")
+
+            except Exception as e:
+                db.session.rollback()
+                flash("Failed to add resource. Please try again.", "danger")
+                return redirect("/resources/add")
 
         return render_template("add_resource.html")
 
+
     @app.route("/resources/delete/<int:resource_id>")
     def delete_resource(resource_id):
-        from models import Resource
+
         resource = Resource.query.get_or_404(resource_id)
         db.session.delete(resource)
         db.session.commit()
         flash("Resource deleted successfully", "success")
         return redirect("/resources")
 
-    # ---------------- ALLOCATION ----------------
+    # ================= ALLOCATION =================
     @app.route("/allocate", methods=["GET", "POST"])
     def allocate_resource():
-        from models import Event, Resource, EventResourceAllocation
 
         events = Event.query.all()
         resources = Resource.query.all()
@@ -105,58 +172,113 @@ def create_app():
         if request.method == "POST":
             event_id = int(request.form["event_id"])
             resource_id = int(request.form["resource_id"])
+
             event = Event.query.get(event_id)
 
-            existing_allocations = EventResourceAllocation.query.filter_by(
-                resource_id=resource_id
+            # ✅ CHECK 1: Event already has a resource
+            existing_event_allocation = EventResourceAllocation.query.filter_by(
+                event_id=event_id,
+                is_active=True
+            ).first()
+
+            if existing_event_allocation:
+                error = (
+                    f"❌ Event '{event.title}' already has a resource assigned "
+                    f"({existing_event_allocation.resource.resource_name})."
+                )
+                return render_template(
+                    "allocate_resource.html",
+                    events=events,
+                    resources=resources,
+                    error=error
+                )
+
+            # ✅ CHECK 2: Resource conflict (time overlap)
+            allocations = EventResourceAllocation.query.filter_by(
+                resource_id=resource_id,
+                is_active=True
             ).all()
 
-            for alloc in existing_allocations:
+            for alloc in allocations:
                 existing_event = alloc.event
-                if event.start_time < existing_event.end_time and existing_event.start_time < event.end_time:
+
+                if (
+                    event.start_time < existing_event.end_time and
+                    existing_event.start_time < event.end_time
+                ):
                     error = (
-                        f"Resource '{alloc.resource.resource_name}' "
-                        f"is already allocated to '{existing_event.title}' "
+                        f"❌ Resource '{alloc.resource.resource_name}' is already booked "
+                        f"for '{existing_event.title}' "
                         f"({existing_event.start_time} - {existing_event.end_time})"
                     )
                     break
 
-            if not error:
-                allocation = EventResourceAllocation(
-                    event_id=event_id,
-                    resource_id=resource_id
+            if error:
+                return render_template(
+                    "allocate_resource.html",
+                    events=events,
+                    resources=resources,
+                    error=error
                 )
-                db.session.add(allocation)
-                db.session.commit()
-                flash("Resource allocated successfully", "success")
-                return redirect("/allocations")
+
+            # ✅ SAFE TO ALLOCATE
+            allocation = EventResourceAllocation(
+                event_id=event_id,
+                resource_id=resource_id,
+                is_active=True
+            )
+
+            db.session.add(allocation)
+            db.session.commit()
+
+            flash("Resource allocated successfully", "success")
+            return redirect("/allocations")
 
         return render_template(
             "allocate_resource.html",
             events=events,
             resources=resources,
-            error=error
+            error=None
+        )
+        
+    # Automatically deactivate expired allocations
+    def cleanup_expired_allocations():
+        now = datetime.now()
+        expired = (
+            EventResourceAllocation.query
+            .join(Event)
+            .filter(Event.end_time < now,
+                    EventResourceAllocation.is_active == True)
+            .all()
         )
 
+        for alloc in expired:
+            alloc.is_active = False
+
+        db.session.commit()
+
+    # ================= ALLOCATIONS =================
     @app.route("/allocations")
     def view_allocations():
-        from models import EventResourceAllocation
-        allocations = EventResourceAllocation.query.all()
+        cleanup_expired_allocations()
+
+        allocations = EventResourceAllocation.query.filter_by(is_active=True).all()
         return render_template("allocations.html", allocations=allocations)
+
 
     @app.route("/allocations/delete/<int:allocation_id>")
     def delete_allocation(allocation_id):
-        from models import EventResourceAllocation
+
         allocation = EventResourceAllocation.query.get_or_404(allocation_id)
+        
         db.session.delete(allocation)
         db.session.commit()
         flash("Allocation removed successfully", "success")
         return redirect("/allocations")
 
-    # ---------------- REPORT ----------------
+    # ================= REPORT =================
     @app.route("/report", methods=["GET", "POST"])
     def resource_report():
-        from models import Resource
 
         report = []
 
@@ -169,12 +291,11 @@ def create_app():
                 upcoming = []
 
                 for alloc in resource.allocations:
-                    event = alloc.event
-                    if event.start_time < end_date and event.end_time > start_date:
-                        overlap_start = max(event.start_time, start_date)
-                        overlap_end = min(event.end_time, end_date)
-                        total_hours += (overlap_end - overlap_start).total_seconds() / 3600
-                        upcoming.append(f"{event.title} ({event.start_time} - {event.end_time})")
+                    e = alloc.event
+                    if e.start_time < end_date and e.end_time > start_date:
+                        overlap = min(e.end_time, end_date) - max(e.start_time, start_date)
+                        total_hours += overlap.total_seconds() / 3600
+                        upcoming.append(f"{e.title} ({e.start_time} - {e.end_time})")
 
                 report.append({
                     "resource": f"{resource.resource_name} ({resource.resource_type})",
@@ -185,7 +306,6 @@ def create_app():
         return render_template("resource_report.html", report=report)
 
     return app
-
 
 app = create_app()
 

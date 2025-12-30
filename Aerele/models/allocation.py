@@ -6,6 +6,8 @@ class EventResourceAllocation(db.Model):
     allocation_id = db.Column(db.Integer, primary_key=True)
     event_id = db.Column(db.Integer, db.ForeignKey("events.event_id"), nullable=False)
     resource_id = db.Column(db.Integer, db.ForeignKey("resources.resource_id"), nullable=False)
+    is_active = db.Column(db.Boolean, default=True)
+
 
     event = db.relationship("Event", back_populates="allocations")
     resource = db.relationship("Resource", back_populates="allocations")
