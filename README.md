@@ -16,12 +16,14 @@ This project was developed as part of a **technical hiring assignment** to demon
   - Start time
   - End time
   - Description
+  - is_active
 
 ### 🔹 Resource Management
 - Manage shared resources such as:
   - Rooms
   - Instructors
   - Equipment
+  - custom
 - Full CRUD support (Create, View, Edit, Delete)
 
 ### 🔹 Resource Allocation
